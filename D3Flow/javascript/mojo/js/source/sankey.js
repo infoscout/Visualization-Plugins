@@ -227,7 +227,8 @@ d3.sankey = function() {
             i;
 
         // Push any overlapping nodes down.
-        nodes.sort(ascendingDepth);
+        //nodes.sort(ascendingDepth);
+		nodes.sort(alphabetical);												// InfoScout edit - sorts nodes alphabetically instead of by size
         for (i = 0; i < n; ++i) {
           node = nodes[i];
           dy = y0 - node.y;
@@ -253,6 +254,11 @@ d3.sankey = function() {
 
     function ascendingDepth(a, b) {
       return a.y - b.y;
+    }
+	
+	// InfoScout attempt at alphabetical node sorting
+	function alphabetical(a, b) {
+      return d3.ascending(a.title, b.title);
     }
   }
 

@@ -20,8 +20,11 @@
             errorDetails: "This visualization requires one or more attributes and one metric.",
 
            // externalLibraries: [{url: "http://d3js.org/d3.v3.min.js"}, {url: "../plugins/D3Flow/javascript/mojo/js/source/sankey.js"}, {url: "http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.3.min.js"}],
-            externalLibraries: [{url: "//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"}, {url: "https://rawgit.com/mstr-dev/Visualization-Plugins/master/D3Flow/javascript/mojo/js/source/sankey.js"}, {url: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"}],
-
+            //externalLibraries: [{url: "https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"}, {url: "https://rawgit.com/mstr-dev/Visualization-Plugins/master/D3Flow/javascript/mojo/js/source/sankey.js"}, {url: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"}],
+			
+			/// InfoScout attempt to sort alphabetically
+			externalLibraries: [{url: "https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"}, {url: "../plugins/D3Flow/javascript/mojo/js/source/sankey.js"}, {url: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"}],
+			
             useRichTooltip: true,
 
             reuseDOMNode: true,
@@ -42,7 +45,7 @@
                 // nodes items: {name: XXX}
 
                 // gridData.getRowTitles().size() // Nb Attributes
-                //var lAttributeName = gridData.getRowTitles().getTitle(i).getName(); // Attrbiute Name
+                //var lAttributeName = gridData.getRowTitles().getTitle(i).getName(); // Attribute Name
                 var gridData = this.dataInterface;
                 if (gridData.getRowTitles().size() <= 1) return;
                 var mMyData = [];
@@ -151,13 +154,17 @@
                  //   .attr("id", "sankey-chart")
                 var units = lMetricName;
 
-                var margin = {top: 10, right: 10, bottom: 10, left: 10},
+                //var margin = {top: 10, right: 10, bottom: 10, left: 10},
+				var margin = {top: 10, right: 10, bottom: 30, left: 10}, 		// InfoScout edit
                     width = mWidth - margin.left - margin.right,
                     height = mHeight - margin.top - margin.bottom;
 
                 var formatNumber = d3.format(",.0f"),    // zero decimal places
                     format = function(d) { return formatNumber(d) + " " + units; },
-                    color = d3.scale.category20();
+                    //color = d3.scale.category20();
+					color = d3.scale.category10();
+					//var domain = ["#79429D","#CD0DB8","#E1C224","#6DBE40","#15A4FA","#FF7011"];			// InfoScout - attempt to use InfoScout color palette
+					//color.domain(domain);
 // append the svg canvas to the page
                 //var svg = d3.selectAll($('#' + lD3ID).toArray()).append("svg")
 				//for some reason, upper selectAll does not work, replace it with select domNode
@@ -204,10 +211,14 @@
                     .sort(function(a, b) { return b.dy - a.dy; });
 
 // add the link titles
-                link.append("title")
+                /* link.append("title")
                     .text(function(d) {
                         return mstrmojo.string.decodeHtmlString(d.source.name) + " → " +
-                            mstrmojo.string.decodeHtmlString(d.target.name) + "\n" + format(d.value); });
+                            mstrmojo.string.decodeHtmlString(d.target.name) + "\n" + format(d.value); }); */
+				link.append("title")
+                    .html(function(d) {																		 		// InfoScout edit - needed for line breaks in Tooltips
+                        return mstrmojo.string.decodeHtmlString(d.source.name) + " → " +
+                            mstrmojo.string.decodeHtmlString(d.target.name) + "<br/>" + format(d.value); });
 
 // add in the nodes
                 var node = svg.append("g").selectAll(".node")
@@ -233,8 +244,10 @@ console.log(this);
                     .style("stroke", function(d) {
                         return d3.rgb(d.color).darker(2); })
                     .append("title")
-                    .text(function(d) {
-                        return mstrmojo.string.decodeHtmlString(d.name) + "\n" + format(d.value); });
+                    /*.text(function(d) {
+                        return mstrmojo.string.decodeHtmlString(d.name) + "\n" + format(d.value); }); */
+					.html(function(d) {
+                        return mstrmojo.string.decodeHtmlString(d.name) + "<br/>" + format(d.value); });			// InfoScout edit - needed for line breaks in Tooltips
 
 // add in the title for the nodes
                 node.append("text")
@@ -254,7 +267,8 @@ console.log(this);
 		console.log(d);
                     d3.select(this).attr("transform",
                         "translate(" + (
-                            d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+                            //d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+							d.x																						// InfoScout edit - don't allow moving nodes left or right (only vertically)
                         ) + "," + (
                             d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
                         ) + ")");
