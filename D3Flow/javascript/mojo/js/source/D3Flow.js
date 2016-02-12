@@ -155,16 +155,17 @@
                 var units = lMetricName;
 
                 //var margin = {top: 10, right: 10, bottom: 10, left: 10},
-				var margin = {top: 10, right: 10, bottom: 30, left: 10}, 		// InfoScout edit
+				var margin = {top: 10, right: 10, bottom: 30, left: 10}, 											// InfoScout edit - increase bottom margin so it doesn't get cut off
                     width = mWidth - margin.left - margin.right,
                     height = mHeight - margin.top - margin.bottom;
 
                 var formatNumber = d3.format(",.0f"),    // zero decimal places
                     format = function(d) { return formatNumber(d) + " " + units; },
                     //color = d3.scale.category20();
-					color = d3.scale.category10();
-					//var domain = ["#79429D","#CD0DB8","#E1C224","#6DBE40","#15A4FA","#FF7011"];			// InfoScout - attempt to use InfoScout color palette
-					//color.domain(domain);
+					color = d3.scale.ordinal()																		// Use InfoScout color palette
+						.domain([0,1,2,3,4,5,6])
+						.range(["#79429D","#CD0DB8","#E1C224","#6DBE40","#15A4FA","#FF7011"]);
+					
 // append the svg canvas to the page
                 //var svg = d3.selectAll($('#' + lD3ID).toArray()).append("svg")
 				//for some reason, upper selectAll does not work, replace it with select domNode
@@ -239,8 +240,9 @@ console.log(this);
                 node.append("rect")
                     .attr("height", function(d) { return d.dy; })
                     .attr("width", sankey.nodeWidth())
-                    .style("fill", function(d) {
-                        return d.color = color(d.name.replace(/ .*/, "")); })
+                    .style("fill", function(d,i) {
+                        //return d.color = color(d.name.replace(/ .*/, "")); })
+						return d.color = color(i); })
                     .style("stroke", function(d) {
                         return d3.rgb(d.color).darker(2); })
                     .append("title")
